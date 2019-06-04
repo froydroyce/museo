@@ -6,6 +6,7 @@ require './lib/photograph'
 require './lib/curator'
 require 'pry'
 
+
 class CuratorTest < MiniTest::Test
   def setup
     @curator = Curator.new
@@ -166,5 +167,49 @@ class CuratorTest < MiniTest::Test
     child  = @curator.find_photograph_by_id("4")
 
     assert_equal [moonrise, identical, child], @curator.photographs_taken_by_artist_from("United States")
+  end
+
+  def test_it_can_load_photographs
+    @curator.load_photographs('./data/photographs.csv')
+    rue = @curator.find_photograph_by_id("1")
+    moonrise  = @curator.find_photograph_by_id("2")
+    identical  = @curator.find_photograph_by_id("3")
+    child  = @curator.find_photograph_by_id("4")
+
+    assert_equal [rue, moonrise, identical, child], @curator.photographs
+  end
+
+  def test_it_can_load_artists
+    @curator.load_artists('./data/artists.csv')
+    henri = @curator.find_artist_by_id("1")
+    ansel = @curator.find_artist_by_id("2")
+    diane = @curator.find_artist_by_id("3")
+    walker = @curator.find_artist_by_id("4")
+    manuel = @curator.find_artist_by_id("5")
+    bill = @curator.find_artist_by_id("6")
+
+    assert_equal [henri, ansel, diane, walker, manuel, bill], @curator.artists
+  end
+
+  def test_it_can_find_photo_from_year_range
+    @curator.load_photographs('./data/photographs.csv')
+    rue = @curator.find_photograph_by_id("1")
+    moonrise  = @curator.find_photograph_by_id("2")
+    identical  = @curator.find_photograph_by_id("3")
+    child  = @curator.find_photograph_by_id("4")
+
+    assert_equal [rue, child], @curator.photographs_taken_between(1950..1965)
+  end
+
+  def test_it_can_find_artists_photographs_by_age
+    @curator.load_artists('./data/artists.csv')
+    @curator.load_photographs('./data/photographs.csv')
+    diane_arbus = @curator.find_artist_by_id("3")
+    expected = {
+      44=>"Identical Twins, Roselle, New Jersey",
+      39=>"Child with Toy Hand Grenade in Central Park"
+    }
+
+    assert_equal expected, @curator.artists_photographs_by_age(diane_arbus)
   end
 end

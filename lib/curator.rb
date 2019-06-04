@@ -1,3 +1,6 @@
+require 'csv'
+require 'date'
+
 class Curator
   attr_reader :artists, :photographs
 
@@ -42,5 +45,32 @@ class Curator
     find_artists_by_country(country).flat_map do |artist|
       find_photographs_by_artist(artist)
     end
+  end
+
+  def load_photographs(filepath)
+    CSV.foreach(filepath, headers: true, header_converters: :symbol) do |row|
+      @photographs << Photograph.new(row)
+    end
+  end
+
+  def load_artists(filepath)
+    CSV.foreach(filepath, headers: true, header_converters: :symbol) do |row|
+      @artists << Artist.new(row)
+    end
+  end
+
+  def photographs_taken_between(range)
+    @photographs.find_all do |photo|
+      range.include? photo.year
+    end
+  end
+
+  def artists_photographs_by_age(artist)
+    photos_by_age = {}
+    current_year = Date.today.strftime("%Y").to_i
+    find_photographs_by_artist(artist).each do |photo|
+      photos_by_age[photo.year - artist.born.to_i] = photo.name
+    end
+    photos_by_age
   end
 end
