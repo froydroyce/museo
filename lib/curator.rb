@@ -1,5 +1,4 @@
 require 'csv'
-require 'date'
 
 class Curator
   attr_reader :artists, :photographs
@@ -67,7 +66,6 @@ class Curator
 
   def artists_photographs_by_age(artist)
     photos_by_age = {}
-    current_year = Date.today.strftime("%Y").to_i
     find_photographs_by_artist(artist).each do |photo|
       photos_by_age[photo.year - artist.born.to_i] = photo.name
     end
